@@ -1,0 +1,26 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+<nav>
+    <a href="{% url 'dashboard' %}">Dashboard</a>
+    <a href="{% url 'nouveau_dossier' %}">Nouveau Dossier</a>
+    <a href="{% url 'administration' %}">Administration</a>
+    <a href="{% url 'logout' %}">Déconnexion</a>
+    <span>Connecté en tant que : {{ request.user.username }}</span>
+</nav>
+
+<h1>Administration</h1>
+
+<h2 style="color: var(--blanc); padding: 0 24px;">Conseillers ({{ conseillers|length }})</h2>
+<ul style="padding: 0 24px;">
+    {% for c in conseillers %}
+        <li>{{ c.user.username }} — {{ c.agence }} ({{ c.role }})</li>
+    {% endfor %}
+</ul>
+
+<h2 style="color: var(--blanc); padding: 24px 24px 0;">Tous les dossiers ({{ dossiers|length }})</h2>
+<ul style="padding: 0 24px;">
+    {% for d in dossiers %}
+        <li>{{ d.client_nom }} {{ d.client_prenom }} — {{ d.score_risque }}% ({{ d.niveau_risque }}) — par {{ d.conseiller.user.username }}</li>
+    {% endfor %}
+</ul>

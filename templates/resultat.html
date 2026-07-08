@@ -1,0 +1,16 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+<h1>Résultat du Scoring</h1>
+
+<h2>Score de risque : {{ score_risque }}%</h2>
+<p>Niveau de risque : <strong>{{ niveau }}</strong></p>
+
+<h3>Données saisies</h3>
+<ul>
+    <li>Âge : {{ donnees.age }}</li>
+    <li>Revenu mensuel : {{ donnees.revenu_mensuel }} MAD</li>
+    <li>Taux d'utilisation crédit : {{ donnees.revolving_utilization }}</li>
+    <li>Ratio d'endettement : {{ donnees.debt_ratio }}</li>
+</ul>
+<a href="{% url 'chatbot' dossier.id %}" style="display: inline-block; margin-top: 10px; color: var(--rouge);">💬 Poser une question à l'IA sur ce dossier</a>
+<a href="{% url 'nouveau_dossier' %}">Nouveau dossier</a>

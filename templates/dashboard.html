@@ -1,0 +1,11 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+<nav>
+    <a href="{% url 'dashboard' %}">Dashboard</a>
+    <a href="{% url 'nouveau_dossier' %}">Nouveau Dossier</a>
+    <a href="{% url 'logout' %}">Déconnexion</a>
+    <span>Connecté en tant que : {{ request.user.username }}</span>
+</nav>
+
+<h1>Dashboard EQDOM</h1>
+<p>Si tu vois cette page, c'est que t'es connecté !</p>

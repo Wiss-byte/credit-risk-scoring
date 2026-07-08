@@ -1,0 +1,32 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+<nav>
+    <a href="{% url 'dashboard' %}">Dashboard</a>
+    <a href="{% url 'nouveau_dossier' %}">Nouveau Dossier</a>
+    <a href="{% url 'administration' %}">Administration</a>
+    <a href="{% url 'logout' %}">Déconnexion</a>
+    <span>Connecté en tant que : {{ request.user.username }}</span>
+</nav>
+
+<div style="padding: 24px; max-width: 700px; margin: 0 auto;">
+    <h1>Chatbot — {{ dossier.client_nom }} {{ dossier.client_prenom }}</h1>
+
+    <div style="background-color: #1e1e1e; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+        <p>Score : {{ dossier.score_risque }}% ({{ dossier.niveau_risque }})</p>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        <label>Pose une question sur ce dossier</label>
+        <input type="text" name="question" placeholder="Ex: Pourquoi ce client est-il à risque élevé ?" required value="{{ question|default:'' }}">
+        <button type="submit">Envoyer</button>
+    </form>
+
+    {% if reponse %}
+    <div style="background-color: #1e1e1e; padding: 16px; border-radius: 8px; margin-top: 20px; border-left: 4px solid var(--rouge);">
+        <strong style="color: var(--rouge);">Réponse :</strong>
+        <p style="margin-top: 8px; white-space: pre-wrap;">{{ reponse }}</p>
+    </div>
+    {% endif %}
+</div>

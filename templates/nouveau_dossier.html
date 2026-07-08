@@ -1,0 +1,106 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+<nav>
+    <a href="{% url 'dashboard' %}">Dashboard</a>
+    <a href="{% url 'nouveau_dossier' %}">Nouveau Dossier</a>
+    <a href="{% url 'administration' %}">Administration</a>
+    <a href="{% url 'logout' %}">Déconnexion</a>
+    <span>Connecté en tant que : {{ request.user.username }}</span>
+</nav>
+
+<h1>Nouveau Dossier Crédit</h1>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <label>Nom</label>
+    <input type="text" name="client_nom" required>
+
+    <label>Prénom</label>
+    <input type="text" name="client_prenom" required>
+
+    <label>Âge</label>
+    <input type="number" name="age" required>
+
+    <label>Revenu mensuel (MAD)</label>
+    <input type="number" name="revenu_mensuel" step="0.01" required>
+
+    <label>Scanner un bulletin de paie (optionnel)</label>
+    <input type="file" name="document_paie" accept="image/*,.pdf">
+    <button type="button" onclick="scannerDocument()">Extraire le revenu automatiquement</button>
+    <p id="resultat_ocr" style="color: #4caf50; margin-top: 8px;"></p>
+
+    <label>Limite de la carte de crédit renouvelable (MAD)</label>
+    <input type="number" name="limite_carte" step="0.01" min="0" required>
+
+    <label>Solde actuellement utilisé sur cette carte (MAD)</label>
+    <input type="number" name="solde_carte" step="0.01" min="0" required>
+
+    <label>Total des mensualités déjà engagées — loyer, autres crédits (MAD)</label>
+    <input type="number" name="mensualites_engagees" step="0.01" min="0" required>
+
+    <label>Nombre de lignes de crédit ouvertes</label>
+    <input type="number" name="nb_open_credit_lines" required>
+
+    <label>Nombre de prêts immobiliers</label>
+    <input type="number" name="nb_real_estate_loans" required>
+
+    <label>Nombre de personnes à charge</label>
+    <input type="number" name="nb_dependents" required>
+
+    <label>Historique de paiement (rapport Crédit Bureau)</label>
+    <select name="historique_paiement" required>
+        <option value="aucun">Aucun incident de paiement</option>
+        <option value="leger">Léger (retard occasionnel, &lt; 60 jours)</option>
+        <option value="grave">Grave (retards répétés ou sévères)</option>
+    </select>
+
+    <button type="submit">Calculer le score</button>
+</form>
+
+<script>
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+}
+
+function scannerDocument() {
+    const fichierInput = document.querySelector('input[name="document_paie"]');
+    const resultatEl = document.getElementById('resultat_ocr');
+
+    if (!fichierInput.files.length) {
+        resultatEl.style.color = '#e63950';
+        resultatEl.textContent = "Sélectionne d'abord un fichier.";
+        return;
+    }
+
+    resultatEl.style.color = '#999';
+    resultatEl.textContent = "Analyse en cours...";
+
+    const formData = new FormData();
+    formData.append('document_paie', fichierInput.files[0]);
+
+    fetch("{% url 'scanner_document' %}", {
+        method: 'POST',
+        headers: { 'X-CSRFToken': getCookie('csrftoken') },
+        body: formData,
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.succes && data.revenu_detecte) {
+            document.querySelector('input[name="revenu_mensuel"]').value = data.revenu_detecte;
+            resultatEl.style.color = '#4caf50';
+            resultatEl.textContent = `Revenu détecté : ${data.revenu_detecte} MAD (vérifie et corrige si besoin)`;
+        } else {
+            resultatEl.style.color = '#e63950';
+            resultatEl.textContent = "Aucun montant détecté, remplis le champ manuellement.";
+        }
+    })
+    .catch(() => {
+        resultatEl.style.color = '#e63950';
+        resultatEl.textContent = "Erreur lors de l'analyse.";
+    });
+}
+</script>

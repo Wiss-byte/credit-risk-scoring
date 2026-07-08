@@ -1,0 +1,9 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+<h1>Inscription Conseiller EQDOM</h1>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Créer mon compte</button>
+</form>
+<p>Déjà inscrit ? <a href="{% url 'login' %}">Se connecter</a></p>
