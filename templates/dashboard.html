@@ -1,11 +1,92 @@
 {% load static %}
 <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
 <nav>
+    <img src="{% static 'img/eqdom_logo.png' %}" alt="EQDOM" class="logo">
     <a href="{% url 'dashboard' %}">Dashboard</a>
     <a href="{% url 'nouveau_dossier' %}">Nouveau Dossier</a>
+    {% if request.user.conseiller.role == 'admin' %}
+    <a href="{% url 'administration' %}">Administration</a>
+    {% endif %}
     <a href="{% url 'logout' %}">Déconnexion</a>
     <span>Connecté en tant que : {{ request.user.username }}</span>
 </nav>
 
-<h1>Dashboard EQDOM</h1>
-<p>Si tu vois cette page, c'est que t'es connecté !</p>
+<div class="page">
+    <h1>Dashboard EQDOM</h1>
+    <p class="sous-titre">Bienvenue, {{ request.user.username }} — vue d'ensemble de tous les dossiers</p>
+
+    <form method="get" style="margin-bottom: 24px;">
+        <input type="text" name="q" placeholder="Rechercher un client par nom ou prénom..." value="{{ recherche }}" style="max-width: 400px;">
+    </form>
+
+    <div class="grille-stats">
+        <div class="stat-carte">
+            <div class="valeur">{{ total_dossiers }}</div>
+            <div class="label">Dossiers créés</div>
+        </div>
+        <div class="stat-carte" style="border-left-color: #2e7d32;">
+            <div class="valeur">{{ nb_faible }}</div>
+            <div class="label">Risque faible</div>
+        </div>
+        <div class="stat-carte" style="border-left-color: #e65100;">
+            <div class="valeur">{{ nb_modere }}</div>
+            <div class="label">Risque modéré</div>
+        </div>
+        <div class="stat-carte" style="border-left-color: #c8102e;">
+            <div class="valeur">{{ nb_eleve }}</div>
+            <div class="label">Risque élevé</div>
+        </div>
+        <div class="stat-carte">
+            <div class="valeur">{{ score_moyen }}%</div>
+            <div class="label">Score moyen</div>
+        </div>
+    </div>
+
+    <div class="carte">
+        <h3 style="color: #c8102e; margin-bottom: 16px;">
+            {% if recherche %}
+                Résultats pour "{{ recherche }}"
+            {% else %}
+                Derniers dossiers
+            {% endif %}
+        </h3>
+
+        {% if derniers_dossiers %}
+        <table>
+            <tr>
+                <th>Client</th>
+                <th>Score</th>
+                <th>Niveau</th>
+                <th>Cause principale</th>
+                <th>Créé par</th>
+                <th>Date</th>
+                <th></th>
+            </tr>
+            {% for d in derniers_dossiers %}
+            <tr>
+                <td><strong>{{ d.client_nom }} {{ d.client_prenom }}</strong></td>
+                <td>{{ d.score_risque|floatformat:1 }}%</td>
+                <td>
+                    {% if d.niveau_risque == 'Faible' %}
+                        <span class="badge badge-faible">{{ d.niveau_risque }}</span>
+                    {% elif d.niveau_risque == 'Modéré' %}
+                        <span class="badge badge-modere">{{ d.niveau_risque }}</span>
+                    {% else %}
+                        <span class="badge badge-eleve">{{ d.niveau_risque }}</span>
+                    {% endif %}
+                </td>
+                <td style="font-size: 13px; color: #555;">{{ d.generer_causes.0 }}</td>
+                <td>{{ d.conseiller.user.username }}</td>
+                <td>{{ d.date_creation|date:"d/m/Y H:i" }}</td>
+                <td><a href="{% url 'chatbot' d.id %}" class="lien-retour" style="margin-top:0;">💬 Chatbot</a></td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% elif recherche %}
+        <p style="color: #999;">Aucun client trouvé pour "{{ recherche }}".</p>
+        {% else %}
+        <p style="color: #999;">Aucun dossier créé pour l'instant. <a href="{% url 'nouveau_dossier' %}" class="lien-retour" style="margin-top:0;">Créer le premier dossier</a></p>
+        {% endif %}
+    </div>
+</div>

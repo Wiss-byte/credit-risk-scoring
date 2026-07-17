@@ -1,0 +1,30 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+<nav>
+    <img src="{% static 'img/eqdom_logo.png' %}" alt="EQDOM" class="logo">
+    <a href="{% url 'dashboard' %}">Dashboard</a>
+    <a href="{% url 'administration' %}">Administration</a>
+    <a href="{% url 'logout' %}">Déconnexion</a>
+</nav>
+<div class="page">
+    <h1>Simulation de seuil de risque élevé</h1>
+    <form method="get" style="margin-bottom:20px;">
+        <label>Nouveau seuil (%)</label>
+        <input type="number" name="seuil" value="{{ nouveau_seuil }}" min="0" max="100" step="1" style="max-width:200px;">
+        <button type="submit" style="max-width:200px;">Simuler</button>
+    </form>
+    <div class="grille-stats">
+        <div class="stat-carte">
+            <div class="valeur">{{ nb_actuellement_eleve }}</div>
+            <div class="label">Dossiers "Élevé" (seuil actuel 60%)</div>
+        </div>
+        <div class="stat-carte">
+            <div class="valeur">{{ nb_avec_nouveau_seuil }}</div>
+            <div class="label">Dossiers "Élevé" (seuil à {{ nouveau_seuil }}%)</div>
+        </div>
+        <div class="stat-carte">
+            <div class="valeur">{{ difference }}</div>
+            <div class="label">Différence</div>
+        </div>
+    </div>
+</div>

@@ -6,9 +6,22 @@ dans le contexte d'un dossier de crédit précis.
 """
 
 import requests
+import re
 
 OLLAMA_URL = "http://localhost:11434/api/generate"
 OLLAMA_MODEL = "llama3.2"
+
+
+def nettoyer_reponse(texte):
+    """
+    Retire la syntaxe Markdown basique que le LLM ajoute parfois
+    (gras, italique, titres) pour un affichage HTML propre en texte brut.
+    """
+    texte = re.sub(r'\*\*(.*?)\*\*', r'\1', texte)
+    texte = re.sub(r'\*(.*?)\*', r'\1', texte)
+    texte = re.sub(r'#{1,6}\s*', '', texte)
+    texte = re.sub(r'`(.*?)`', r'\1', texte)
+    return texte.strip()
 
 
 def poser_question_llm(question, dossier):
@@ -46,7 +59,8 @@ sur les données du dossier ci-dessus."""
             timeout=60,
         )
         response.raise_for_status()
-        return response.json().get("response", "Pas de réponse générée.")
+        reponse_brute = response.json().get("response", "Pas de réponse générée.")
+        return nettoyer_reponse(reponse_brute)
 
     except requests.exceptions.ConnectionError:
         return "Erreur : Ollama n'est pas accessible. Vérifie qu'il tourne (commande : ollama serve)."

@@ -1,0 +1,36 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+<nav>
+    <img src="{% static 'img/eqdom_logo.png' %}" alt="EQDOM" class="logo">
+    <a href="{% url 'dashboard' %}">Dashboard</a>
+    <a href="{% url 'administration' %}">Administration</a>
+    <a href="{% url 'logout' %}">Déconnexion</a>
+</nav>
+<div class="page">
+    <h1>Monitoring de Drift</h1>
+    {% if resultat.alerte %}
+    <div class="carte" style="border-left:4px solid #c8102e;">
+        <strong style="color:#c8102e;">⚠️ Drift détecté</strong> — la distribution des dossiers récents diverge du dataset d'entraînement.
+    </div>
+    {% elif resultat.message %}
+    <div class="carte"><p>{{ resultat.message }}</p></div>
+    {% else %}
+    <div class="carte" style="border-left:4px solid #2e7d32;">
+        <strong style="color:#2e7d32;">✅ Pas de drift significatif détecté.</strong>
+    </div>
+    {% endif %}
+    {% if resultat.details %}
+    <div class="carte">
+        <table>
+            <tr><th>Variable</th><th>p-value</th><th>Drift ?</th></tr>
+            {% for feature, r in resultat.details.items %}
+            <tr>
+                <td>{{ feature }}</td>
+                <td>{{ r.p_value }}</td>
+                <td>{% if r.drift_detecte %}<span class="badge badge-eleve">Oui</span>{% else %}<span class="badge badge-faible">Non</span>{% endif %}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    {% endif %}
+</div>

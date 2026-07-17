@@ -1,0 +1,20 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+<nav>
+    <img src="{% static 'img/eqdom_logo.png' %}" alt="EQDOM" class="logo">
+    <a href="{% url 'dashboard' %}">Dashboard</a>
+    <a href="{% url 'nouveau_dossier' %}">Nouveau Dossier</a>
+    {% if request.user.conseiller.role == 'admin' %}<a href="{% url 'administration' %}">Administration</a>{% endif %}
+    <a href="{% url 'logout' %}">Déconnexion</a>
+    <span>Connecté en tant que : {{ request.user.username }}</span>
+</nav>
+<div class="page">
+    <h1>Explication SHAP — {{ dossier.client_nom }} {{ dossier.client_prenom }}</h1>
+    <div class="carte">
+        <h3 style="color:#c8102e; margin-bottom:12px;">Facteurs les plus influents (analyse SHAP)</h3>
+        <ul style="padding-left:20px; line-height:1.8;">
+            {% for phrase in causes_shap %}<li>{{ phrase }}</li>{% endfor %}
+        </ul>
+    </div>
+    <a href="{% url 'dashboard' %}" class="lien-retour">← Retour</a>
+</div>

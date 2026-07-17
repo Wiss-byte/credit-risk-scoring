@@ -1,9 +1,18 @@
 {% load static %}
 <link rel="stylesheet" href="{% static 'css/style.css' %}">
-<h1>Connexion EQDOM</h1>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Se connecter</button>
-</form>
-<p>Pas encore de compte ? <a href="{% url 'register' %}">S'inscrire</a></p>
+
+<nav>
+    <img src="{% static 'img/eqdom_logo.png' %}" alt="EQDOM" class="logo">
+</nav>
+
+<div class="page" style="max-width: 420px;">
+    <h1>Connexion EQDOM</h1>
+    <form method="post">
+        <div class="form-carte">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Se connecter</button>
+        </div>
+    </form>
+    <p style="margin-top: 16px;">Pas encore de compte ? <a href="{% url 'register' %}" class="lien-retour" style="margin-top:0;">S'inscrire</a></p>
+</div>

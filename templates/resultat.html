@@ -1,16 +1,53 @@
 {% load static %}
 <link rel="stylesheet" href="{% static 'css/style.css' %}">
-<h1>Résultat du Scoring</h1>
 
-<h2>Score de risque : {{ score_risque }}%</h2>
-<p>Niveau de risque : <strong>{{ niveau }}</strong></p>
+<nav>
+    <img src="{% static 'img/eqdom_logo.png' %}" alt="EQDOM" class="logo">
+    <a href="{% url 'dashboard' %}">Dashboard</a>
+    <a href="{% url 'nouveau_dossier' %}">Nouveau Dossier</a>
+    {% if request.user.conseiller.role == 'admin' %}
+    <a href="{% url 'administration' %}">Administration</a>
+    {% endif %}
+    <a href="{% url 'logout' %}">Déconnexion</a>
+    <span>Connecté en tant que : {{ request.user.username }}</span>
+</nav>
 
-<h3>Données saisies</h3>
-<ul>
-    <li>Âge : {{ donnees.age }}</li>
-    <li>Revenu mensuel : {{ donnees.revenu_mensuel }} MAD</li>
-    <li>Taux d'utilisation crédit : {{ donnees.revolving_utilization }}</li>
-    <li>Ratio d'endettement : {{ donnees.debt_ratio }}</li>
-</ul>
-<a href="{% url 'chatbot' dossier.id %}" style="display: inline-block; margin-top: 10px; color: var(--rouge);">💬 Poser une question à l'IA sur ce dossier</a>
-<a href="{% url 'nouveau_dossier' %}">Nouveau dossier</a>
+<div class="page">
+    <h1>Résultat du Scoring</h1>
+
+    <div class="carte">
+        <h2 style="margin-bottom: 8px;">Score de risque : {{ score_risque }}%</h2>
+        <p>
+            Niveau de risque :
+            {% if niveau == 'Faible' %}
+                <span class="badge badge-faible">{{ niveau }}</span>
+            {% elif niveau == 'Modéré' %}
+                <span class="badge badge-modere">{{ niveau }}</span>
+            {% else %}
+                <span class="badge badge-eleve">{{ niveau }}</span>
+            {% endif %}
+        </p>
+    </div>
+
+    <div class="carte">
+        <h3 style="color: #c8102e; margin-bottom: 12px;">Causes principales</h3>
+        <ul style="padding-left: 20px; line-height: 1.8;">
+            {% for cause in dossier.generer_causes %}
+            <li>{{ cause }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="carte">
+        <h3 style="color: #c8102e; margin-bottom: 12px;">Données saisies</h3>
+        <table>
+            <tr><td>Âge</td><td>{{ donnees.age }}</td></tr>
+            <tr><td>Revenu mensuel</td><td>{{ donnees.revenu_mensuel }} MAD</td></tr>
+            <tr><td>Taux d'utilisation crédit</td><td>{{ donnees.revolving_utilization|floatformat:2 }}</td></tr>
+            <tr><td>Ratio d'endettement</td><td>{{ donnees.debt_ratio|floatformat:2 }}</td></tr>
+        </table>
+    </div>
+
+    <a href="{% url 'chatbot' dossier.id %}" class="lien-retour">💬 Poser une question à l'IA sur ce dossier</a><br>
+    <a href="{% url 'nouveau_dossier' %}" class="lien-retour">← Nouveau dossier</a>
+</div>

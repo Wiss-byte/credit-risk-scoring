@@ -1,9 +1,15 @@
 :root {
     --rouge: #c8102e;
     --rouge-fonce: #a10d24;
+    --rouge-clair: #e63950;
     --noir: #141414;
     --blanc: #ffffff;
-    --gris-clair: #f4f4f4;
+    --gris-fond: #f5f5f7;
+    --gris-carte: #ffffff;
+    --gris-bordure: #e0e0e0;
+    --gris-texte: #6b6b6b;
+    --vert: #2e7d32;
+    --orange: #e65100;
 }
 
 * {
@@ -14,77 +20,229 @@
 
 body {
     font-family: 'Segoe UI', Arial, sans-serif;
-    background-color: var(--noir);
-    color: var(--blanc);
+    background-color: var(--gris-fond);
+    color: var(--noir);
+    line-height: 1.5;
 }
 
+/* ---------- NAVIGATION ---------- */
 nav {
-    background-color: #1e1e1e;
-    padding: 16px 24px;
+    background-color: var(--noir);
+    padding: 14px 32px;
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 28px;
     border-bottom: 3px solid var(--rouge);
+    flex-wrap: wrap;
+}
+
+nav .logo {
+    height: 38px;
+    width: auto;
+    border-radius: 6px;
 }
 
 nav a {
     color: var(--blanc);
     text-decoration: none;
     font-weight: 600;
+    font-size: 14px;
+    padding: 6px 0;
+    border-bottom: 2px solid transparent;
+    transition: border-color 0.15s;
 }
 
 nav a:hover {
-    color: var(--rouge);
+    border-bottom: 2px solid var(--rouge);
 }
 
 nav span {
     margin-left: auto;
-    color: #999;
-    font-size: 14px;
+    color: #aaa;
+    font-size: 13px;
+}
+
+/* ---------- LAYOUT GÉNÉRAL ---------- */
+.page {
+    padding: 32px;
+    max-width: 1100px;
+    margin: 0 auto;
 }
 
 h1 {
     color: var(--rouge);
-    padding: 24px;
+    font-size: 28px;
+    margin-bottom: 6px;
 }
 
-form {
-    max-width: 500px;
-    margin: 0 auto;
+.sous-titre {
+    color: var(--gris-texte);
+    margin-bottom: 28px;
+    font-size: 14px;
+}
+
+/* ---------- CARTES ---------- */
+.carte {
+    background-color: var(--gris-carte);
+    border: 1px solid var(--gris-bordure);
+    border-radius: 10px;
     padding: 24px;
-    background-color: #1e1e1e;
-    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+
+.grille-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 28px;
+}
+
+.stat-carte {
+    background-color: var(--gris-carte);
+    border: 1px solid var(--gris-bordure);
+    border-radius: 10px;
+    padding: 20px;
+    border-left: 4px solid var(--rouge);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+
+.stat-carte .valeur {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--noir);
+}
+
+.stat-carte .label {
+    color: var(--gris-texte);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 4px;
+}
+
+/* ---------- FORMULAIRES ---------- */
+form {
+    max-width: 640px;
+}
+
+.form-carte {
+    background-color: var(--gris-carte);
+    border: 1px solid var(--gris-bordure);
+    border-radius: 10px;
+    padding: 28px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
 }
 
 label {
     display: block;
-    margin-top: 12px;
-    margin-bottom: 4px;
-    color: #ccc;
-    font-size: 14px;
+    margin-top: 16px;
+    margin-bottom: 6px;
+    color: #444;
+    font-size: 13px;
+    font-weight: 600;
 }
 
-input {
+input, select {
     width: 100%;
-    padding: 10px;
-    border-radius: 4px;
-    border: 1px solid #444;
-    background-color: var(--noir);
-    color: var(--blanc);
+    padding: 11px 14px;
+    border-radius: 6px;
+    border: 1px solid var(--gris-bordure);
+    background-color: var(--blanc);
+    color: var(--noir);
+    font-size: 14px;
+    transition: border-color 0.15s;
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: var(--rouge);
+}
+
+small {
+    display: block;
+    color: var(--gris-texte);
+    font-size: 12px;
+    margin-top: 4px;
 }
 
 button {
-    margin-top: 20px;
+    margin-top: 24px;
     width: 100%;
-    padding: 12px;
+    padding: 13px;
     background-color: var(--rouge);
     color: var(--blanc);
     border: none;
-    border-radius: 4px;
+    border-radius: 6px;
     font-weight: 600;
+    font-size: 14px;
     cursor: pointer;
+    transition: background-color 0.15s;
 }
 
 button:hover {
     background-color: var(--rouge-fonce);
+}
+
+button[type="button"] {
+    background-color: var(--noir);
+    margin-top: 8px;
+}
+
+button[type="button"]:hover {
+    background-color: #333;
+}
+
+/* ---------- BADGES DE RISQUE ---------- */
+.badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.badge-faible { background-color: #e8f5e9; color: var(--vert); }
+.badge-modere { background-color: #fff3e0; color: var(--orange); }
+.badge-eleve  { background-color: #fdecea; color: var(--rouge); }
+
+/* ---------- TABLEAUX (admin, historique) ---------- */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 8px;
+}
+
+th {
+    text-align: left;
+    color: var(--gris-texte);
+    font-size: 12px;
+    text-transform: uppercase;
+    padding: 10px 14px;
+    border-bottom: 2px solid var(--noir);
+}
+
+td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--gris-bordure);
+    font-size: 14px;
+}
+
+tr:hover td {
+    background-color: var(--gris-fond);
+}
+
+/* ---------- LIENS GÉNÉRIQUES ---------- */
+a.lien-retour {
+    display: inline-block;
+    margin-top: 16px;
+    color: var(--rouge);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+a.lien-retour:hover {
+    text-decoration: underline;
 }

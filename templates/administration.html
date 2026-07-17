@@ -2,25 +2,121 @@
 <link rel="stylesheet" href="{% static 'css/style.css' %}">
 
 <nav>
+    <img src="{% static 'img/eqdom_logo.png' %}" alt="EQDOM" class="logo">
     <a href="{% url 'dashboard' %}">Dashboard</a>
     <a href="{% url 'nouveau_dossier' %}">Nouveau Dossier</a>
     <a href="{% url 'administration' %}">Administration</a>
+    <a href="{% url 'simulation_seuil' %}">Simulation seuil</a>
+    <a href="{% url 'monitoring_drift' %}">Drift</a>
     <a href="{% url 'logout' %}">Déconnexion</a>
     <span>Connecté en tant que : {{ request.user.username }}</span>
 </nav>
 
-<h1>Administration</h1>
+<div class="page">
+    <h1>Administration</h1>
+    <p class="sous-titre">Vue d'ensemble de l'activité EQDOM Score</p>
 
-<h2 style="color: var(--blanc); padding: 0 24px;">Conseillers ({{ conseillers|length }})</h2>
-<ul style="padding: 0 24px;">
-    {% for c in conseillers %}
-        <li>{{ c.user.username }} — {{ c.agence }} ({{ c.role }})</li>
-    {% endfor %}
-</ul>
+    <div class="grille-stats">
+        <div class="stat-carte">
+            <div class="valeur">{{ total_dossiers }}</div>
+            <div class="label">Dossiers total</div>
+        </div>
+        <div class="stat-carte" style="border-left-color: #2e7d32;">
+            <div class="valeur">{{ nb_faible }}</div>
+            <div class="label">Risque faible</div>
+        </div>
+        <div class="stat-carte" style="border-left-color: #e65100;">
+            <div class="valeur">{{ nb_modere }}</div>
+            <div class="label">Risque modéré</div>
+        </div>
+        <div class="stat-carte" style="border-left-color: #c8102e;">
+            <div class="valeur">{{ nb_eleve }}</div>
+            <div class="label">Risque élevé</div>
+        </div>
+        <div class="stat-carte">
+            <div class="valeur">{{ score_moyen }}%</div>
+            <div class="label">Score moyen</div>
+        </div>
+    </div>
 
-<h2 style="color: var(--blanc); padding: 24px 24px 0;">Tous les dossiers ({{ dossiers|length }})</h2>
-<ul style="padding: 0 24px;">
-    {% for d in dossiers %}
-        <li>{{ d.client_nom }} {{ d.client_prenom }} — {{ d.score_risque }}% ({{ d.niveau_risque }}) — par {{ d.conseiller.user.username }}</li>
-    {% endfor %}
-</ul>
+    <div class="carte">
+        <h3 style="color: #c8102e; margin-bottom: 16px;">Conseillers ({{ conseillers|length }})</h3>
+        <table>
+            <tr><th>Utilisateur</th><th>Agence</th><th>Rôle</th></tr>
+            {% for c in conseillers %}
+            <tr>
+                <td><strong>{{ c.user.username }}</strong></td>
+                <td>{{ c.agence }}</td>
+                <td>{% if c.role == 'admin' %}<span class="badge badge-eleve">Administrateur</span>{% else %}<span class="badge badge-faible">Conseiller</span>{% endif %}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <div class="carte">
+        <h3 style="color: #c8102e; margin-bottom: 16px;">Performance par conseiller</h3>
+        <table>
+            <tr><th>Conseiller</th><th>Dossiers traités</th><th>Score moyen</th></tr>
+            {% for p in perf_conseillers %}
+            <tr><td>{{ p.nom }}</td><td>{{ p.nb }}</td><td>{{ p.moy }}%</td></tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <div class="carte">
+        <h3 style="color: #c8102e; margin-bottom: 16px;">Causes de refus les plus fréquentes</h3>
+        <table>
+            <tr><th>Cause</th><th>Occurrences</th></tr>
+            {% for cause, nb in causes_frequentes %}
+            <tr><td>{{ cause }}</td><td>{{ nb }}</td></tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <div class="carte">
+        <h3 style="color: #c8102e; margin-bottom: 16px;">Segmentation par âge</h3>
+        <table>
+            <tr><th>Tranche</th><th>Nombre de dossiers</th></tr>
+            {% for tranche, nb in segments_age.items %}
+            <tr><td>{{ tranche }}</td><td>{{ nb }}</td></tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <div class="carte">
+        <h3 style="color: #c8102e; margin-bottom: 16px;">Segmentation par revenu</h3>
+        <table>
+            <tr><th>Tranche</th><th>Nombre de dossiers</th></tr>
+            {% for tranche, nb in segments_revenu.items %}
+            <tr><td>{{ tranche }}</td><td>{{ nb }}</td></tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <div class="carte">
+        <h3 style="color: #c8102e; margin-bottom: 16px;">Tous les dossiers ({{ dossiers|length }})</h3>
+        <table>
+            <tr>
+                <th>Client</th><th>Âge</th><th>Revenu (MAD)</th><th>Score</th>
+                <th>Niveau</th><th>Conseiller</th><th>Date</th>
+            </tr>
+            {% for d in dossiers %}
+            <tr>
+                <td><strong>{{ d.client_nom }} {{ d.client_prenom }}</strong></td>
+                <td>{{ d.age }}</td>
+                <td>{{ d.revenu_mensuel|floatformat:0 }}</td>
+                <td>{{ d.score_risque|floatformat:1 }}%</td>
+                <td>
+                    {% if d.niveau_risque == 'Faible' %}<span class="badge badge-faible">{{ d.niveau_risque }}</span>
+                    {% elif d.niveau_risque == 'Modéré' %}<span class="badge badge-modere">{{ d.niveau_risque }}</span>
+                    {% else %}<span class="badge badge-eleve">{{ d.niveau_risque }}</span>{% endif %}
+                </td>
+                <td>{{ d.conseiller.user.username }}</td>
+                <td>{{ d.date_creation|date:"d/m/Y H:i" }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7" style="text-align:center; color:#999;">Aucun dossier pour l'instant</td></tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
