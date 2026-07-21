@@ -81,3 +81,60 @@ class LogScoring(models.Model):
 
     def __str__(self):
         return f"Log {self.dossier} — {self.date_calcul}"
+    
+def get_dossiers_valides():
+    """
+    Couche Silver : ne retourne que les dossiers dont les valeurs
+    respectent les règles métier de cohérence (pas de valeurs aberrantes).
+    """
+    return DossierCredit.objects.filter(
+        age__gte=18, age__lte=100,
+        debt_ratio__lte=1,
+        revolving_utilization__lte=1,
+        revenu_mensuel__gt=0,
+        nb_open_credit_lines__lte=20,
+    )
+class StatsMensuelles(models.Model):
+    mois = models.DateField(unique=True)
+    nb_dossiers = models.IntegerField()
+    score_moyen = models.FloatField()
+    nb_faible = models.IntegerField()
+    nb_modere = models.IntegerField()
+    nb_eleve = models.IntegerField()
+    date_calcul = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Stats {self.mois.strftime('%Y-%m')}"   
+class DimTemps(models.Model):
+    date = models.DateField(unique=True)
+    annee = models.IntegerField()
+    mois = models.IntegerField()
+    jour = models.IntegerField()
+    trimestre = models.IntegerField()
+    nom_mois = models.CharField(max_length=20)
+
+    def __str__(self):
+        return str(self.date)
+
+
+class DimNiveauRisque(models.Model):
+    libelle = models.CharField(max_length=20, unique=True)
+    couleur = models.CharField(max_length=20)
+
+    def __str__(self):
+        return self.libelle
+
+
+class FaitScoring(models.Model):
+    dossier = models.ForeignKey(DossierCredit, on_delete=models.CASCADE)
+    conseiller = models.ForeignKey(Conseiller, on_delete=models.CASCADE)
+    temps = models.ForeignKey(DimTemps, on_delete=models.CASCADE)
+    niveau_risque = models.ForeignKey(DimNiveauRisque, on_delete=models.CASCADE)
+
+    score_risque = models.FloatField()
+    revenu_mensuel = models.FloatField()
+    debt_ratio = models.FloatField()
+    age_client = models.IntegerField()
+
+    def __str__(self):
+        return f"Fait #{self.id} — {self.dossier.client_nom}"

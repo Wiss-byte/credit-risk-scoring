@@ -13,10 +13,19 @@ from .drift_utils import detecter_drift
 import joblib
 import pandas as pd
 from pathlib import Path
+import hashlib
+
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 MODEL_PATH = BASE_DIR / 'xgboost_model.pkl'
 model = joblib.load(MODEL_PATH)
+def calculer_hash_modele():
+    with open(MODEL_PATH, 'rb') as f:
+        contenu = f.read()
+    return hashlib.md5(contenu).hexdigest()[:10]
+
+VERSION_MODELE_ACTUELLE = calculer_hash_modele()
 
 FEATURE_ORDER = [
     'age', 'revenu_mensuel', 'revolving_utilization', 'debt_ratio',
@@ -116,7 +125,7 @@ def nouveau_dossier(request):
 
         LogScoring.objects.create(
             dossier=dossier, conseiller=conseiller,
-            score_calcule=score_risque, version_modele='xgboost_v1',
+            score_calcule=score_risque, version_modele=VERSION_MODELE_ACTUELLE,
         )
 
         context = {'score_risque': score_risque, 'niveau': niveau, 'donnees': donnees, 'dossier': dossier}
